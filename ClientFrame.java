@@ -9,19 +9,21 @@ import java.util.logging.Logger;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author admin
  */
 public class ClientFrame extends javax.swing.JFrame {
+
     private String user;
-    public static final int PORT=7777; 
-    Socket sock ;
-    public String getUser(){
+    public static final int PORT = 7777;
+    public static final int PORT1 = 777;
+    private Socket sock, sock1;
+
+    public String getUser() {
         return user;
     }
-    
+
     /**
      * Creates new form ClientFrame
      */
@@ -52,6 +54,8 @@ public class ClientFrame extends javax.swing.JFrame {
         received = new javax.swing.JTextArea();
         SendButton = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        usersList = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -79,7 +83,7 @@ public class ClientFrame extends javax.swing.JFrame {
 
         jLabel2.setText("messaggio");
 
-        jLabel3.setText("USER");
+        jLabel3.setText("Destinatario");
 
         destination.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,6 +93,11 @@ public class ClientFrame extends javax.swing.JFrame {
 
         message.setColumns(20);
         message.setRows(5);
+        message.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                messageFocusGained(evt);
+            }
+        });
         jScrollPane1.setViewportView(message);
 
         jLabel4.setText("MESSAGGI RICEVUTI");
@@ -105,6 +114,10 @@ public class ClientFrame extends javax.swing.JFrame {
         });
 
         jLabel5.setText("Lista utenti attivi");
+
+        usersList.setColumns(20);
+        usersList.setRows(5);
+        jScrollPane3.setViewportView(usersList);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -130,7 +143,9 @@ public class ClientFrame extends javax.swing.JFrame {
                             .addComponent(jLabel4)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
                             .addComponent(jScrollPane1))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -157,61 +172,67 @@ public class ClientFrame extends javax.swing.JFrame {
                         .addComponent(LogoutButton)))
                 .addGap(14, 14, 14)
                 .addComponent(jLabel2)
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(SendButton)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(destination, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(SendButton))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(27, 27, 27)
                         .addComponent(jLabel5)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void LogoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutButtonActionPerformed
-       try {    // CREATE STRING LOGOUT + getUser()  
-           //sock= new Socket("localhost",PORT);
-           System.out.println("premuto");
-            OutputStream os=sock.getOutputStream();
-            Writer wr= new OutputStreamWriter(os,"UTF-16");
-            PrintWriter prw=new PrintWriter(wr);
-            prw.println("<LOGOUT>"+"<"+getUser()+">");
+        try {    // CREATE STRING LOGOUT + getUser()  
+            sock = new Socket("localhost", PORT);
+            sock1 = new Socket("localhost", PORT1);
+            System.out.println("premuto");
+            OutputStream os = sock.getOutputStream();
+            Writer wr = new OutputStreamWriter(os, "UTF-16");
+            PrintWriter prw = new PrintWriter(wr);
+            prw.println("<LOGOUT>" + "<" + getUser() + ">");
             prw.flush();
         } catch (IOException ex) {
             Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
-           try {
-               sock.close();
-           } catch (IOException ex) {
-               Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-           }
-       }
+        } finally {
+            try {
+                sock.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void LoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginButtonActionPerformed
         try {    // CREATE STRING LOGIN + getUser()
-            sock= new Socket("localhost",PORT);
-            OutputStream os=sock.getOutputStream();
-            Writer wr= new OutputStreamWriter(os,"UTF-16");
-            PrintWriter prw=new PrintWriter(wr);
-            user=username.getText();
-            prw.println("<LOGIN>"+"<"+getUser()+">");
+            sock = new Socket("localhost", PORT);
+            OutputStream os = sock.getOutputStream();
+            Writer wr = new OutputStreamWriter(os, "UTF-16");
+            PrintWriter prw = new PrintWriter(wr);
+            user = username.getText();
+            prw.println("<LOGIN>" + "<" + getUser() + ">");
             prw.flush();
+            receivedMessage();
         } catch (IOException ex) {
             Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-         
+
     }//GEN-LAST:event_LoginButtonActionPerformed
 
     private void usernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usernameActionPerformed
@@ -223,8 +244,57 @@ public class ClientFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_destinationActionPerformed
 
     private void SendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SendButtonActionPerformed
-        //
+        String messaggio = "";
+        try {
+            if (!"".equals(message.getText())) {
+                if (!"".equals(destination.getText())) {
+                    messaggio = "<ONETOONE>" + "<" + destination.getText() + ">" + "<" + message.getText() + ">";
+                } else {
+                    messaggio = "<BROADCAST>" + "<" + message.getText() + ">";
+                }
+            }
+            OutputStream os = sock.getOutputStream();
+            Writer wr = new OutputStreamWriter(os, "UTF-16");
+            PrintWriter prw = new PrintWriter(wr);
+            System.out.println(messaggio);
+            prw.println(messaggio);
+            prw.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_SendButtonActionPerformed
+
+    private void messageFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_messageFocusGained
+        UpdateUsersList();
+    }//GEN-LAST:event_messageFocusGained
+
+    private void UpdateUsersList() {
+        InputStream is;
+        try {
+            is = sock1.getInputStream();
+            Reader rd = new InputStreamReader(is, "UTF-16");
+            BufferedReader brd = new BufferedReader(rd);
+            String answer = brd.readLine();
+            usersList.append(answer + "/n");
+        } catch (IOException ex) {
+            Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void receivedMessage() {
+        InputStream is;
+        while (sock.isConnected()) {
+            try {
+                is = sock.getInputStream();
+                Reader rd = new InputStreamReader(is, "UTF-16");
+                BufferedReader brd = new BufferedReader(rd);
+                String answer = brd.readLine();
+                message.append(answer + "/n");
+            } catch (IOException ex) {
+                Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -273,8 +343,10 @@ public class ClientFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea message;
     private javax.swing.JTextArea received;
     private javax.swing.JTextField username;
+    private javax.swing.JTextArea usersList;
     // End of variables declaration//GEN-END:variables
 }
