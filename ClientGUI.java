@@ -14,10 +14,12 @@ import javax.swing.JList;
 import javax.swing.JTextArea;
 import java.awt.Color;
 import javax.swing.BoxLayout;
-import net.miginfocom.swing.MigLayout;
+//import net.miginfocom.swing.MigLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.LineBorder;
@@ -121,8 +123,25 @@ public class ClientGUI {
 		messageFiel.setBounds(171, 410, 474, 23);
 		frame.getContentPane().add(messageFiel);
 		messageFiel.setColumns(10);
-		
+		messageFiel.addFocusListener(new FocusListener(){
+                    @Override
+                    public void focusGained(FocusEvent e) {
+                        clientChat.updateUsersList();
+                    }
+
+                    @Override
+                    public void focusLost(FocusEvent e) {
+                        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                    }
+                    
+                });
+                
 		JButton btnSend = new JButton("Send");
+                btnSend.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				clientChat.sendMessage(messageFiel.getText(),(String)usersList.getSelectedValue());
+			}
+		});
 		btnSend.setBounds(655, 410, 101, 23);
 		frame.getContentPane().add(btnSend);
 		
