@@ -8,66 +8,78 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author admin
  */
 public class ThreadedServer implements Runnable {
-    private ArrayList<String> onlineUser;
-     public static final int PORT=7777;
-    
+
+    private static ArrayList<String> onlineUser;
+    public static final int PORT = 7777;
+
     private Socket sock;
-    public ThreadedServer(Socket s){
-        sock=s;
-        onlineUser=new ArrayList<String>();
+
+    public ThreadedServer(Socket s) {
+        sock = s;
+
     }
-    public static void main(String args[]) throws IOException{
-        ServerSocket serv=new ServerSocket(PORT);
-        while(true){
-            Socket sock=serv.accept();
-            ThreadedServer server=new ThreadedServer(sock);
-            Thread t=new Thread(server);
+
+    public static void main(String args[]) throws IOException {
+        ServerSocket serv = new ServerSocket(PORT);
+        onlineUser = new ArrayList<String>();
+        while (true) {
+            Socket sock = serv.accept();
+            ThreadedServer server = new ThreadedServer(sock);
+            Thread t = new Thread(server);
             t.start();
         }
     }
-    
-    private PrintWriter manageRequest(String s){
-        
-        String[] splitted= s.split(">");
-        for (int i=0; i<splitted.length;i++){
-            System.out.println(splitted[i]);
-        }
+
+    private int manageRequest(String s) {
+        int choice = -1;
+        String[] splitted = s.split(">");
         if (splitted[0].equals("<LOGIN")) {
-            onlineUser.add(splitted[1]);
-            System.out.println("size: "+ onlineUser.size());
-        }else if(splitted[0].equals("<LOGOUT")){
-            onlineUser.remove(splitted[1]);
-             System.out.println("size: "+ onlineUser.size());
-            try {
-                sock.close();
-            } catch (IOException ex) {
-                Logger.getLogger(ThreadedServer.class.getName()).log(Level.SEVERE, null, ex);
+            if (!onlineUser.contains(splitted[1])) {
+
+                onlineUser.add(splitted[1]);
+                choice = 1;
+            } else {
+                System.out.println("non accettata");
+                System.out.println(onlineUser.size());
+                choice = 2;
+            }
+        } else if (splitted[0].equals("<LOGOUT")) {
+            System.out.println("seu qui");
+            if (onlineUser.contains(splitted[1])) {
+                onlineUser.remove(splitted[1]);
+                choice = 3;
             }
         }
-         try {
-             PrintWriter prw=new PrintWriter(new OutputStreamWriter(sock.getOutputStream(),"UTF-16"));
-         } catch (IOException ex) {
-             Logger.getLogger(ThreadedServer.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         System.out.println(onlineUser);
-         return null;
+        System.out.println(onlineUser);
+        return choice;
     }
-            
+
     @Override
     public void run() {
-          BufferedReader brd;
-         try {
-             brd = new BufferedReader(new InputStreamReader(sock.getInputStream(),"UTF-16"));
-             String s=brd.readLine();
-             manageRequest(s);
-         } catch (IOException ex) {
-             Logger.getLogger(ThreadedServer.class.getName()).log(Level.SEVERE, null, ex);
-         }
-            
+
+        BufferedReader brd;
+
+        try {
+            brd = new BufferedReader(new InputStreamReader(sock.getInputStream(), "UTF-16"));
+            String s;
+            while (!sock.isClosed() && (s = brd.readLine()) != null) {
+                int choice = manageRequest(s);
+                if (choice == 2 || choice == 3) {
+                    break;
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ThreadedServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            sock.close();
+        } catch (IOException exc2) {
+        }
     }
 }

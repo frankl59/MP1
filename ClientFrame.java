@@ -180,7 +180,9 @@ public class ClientFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void LogoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogoutButtonActionPerformed
-       try {    // CREATE STRING LOGOUT + getUser()           
+       try {    // CREATE STRING LOGOUT + getUser()  
+           //sock= new Socket("localhost",PORT);
+           System.out.println("premuto");
             OutputStream os=sock.getOutputStream();
             Writer wr= new OutputStreamWriter(os,"UTF-16");
             PrintWriter prw=new PrintWriter(wr);
@@ -188,7 +190,13 @@ public class ClientFrame extends javax.swing.JFrame {
             prw.flush();
         } catch (IOException ex) {
             Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }finally{
+           try {
+               sock.close();
+           } catch (IOException ex) {
+               Logger.getLogger(ClientFrame.class.getName()).log(Level.SEVERE, null, ex);
+           }
+       }
     }//GEN-LAST:event_LogoutButtonActionPerformed
 
     private void LoginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginButtonActionPerformed
