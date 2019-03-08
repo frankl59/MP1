@@ -86,7 +86,7 @@ public class ThreadedServer implements Runnable {
             
             // Accept messages from this client and broadcast them.
             while ((s = brd.readLine()) != null) {
-            	
+            	System.out.println(s);
             	String[] messageString = s.substring(2, s.length()-1).split("><");
                
             	code = messageString[0];
@@ -103,25 +103,31 @@ public class ThreadedServer implements Runnable {
                 	for (PrintWriter writer : onlineUsers.values()) {
                 		if(writer != onlineUsers.get(username))
                 			writer.println("<BROADCAST><" + username + "><" + message +">");
-                                writer.flush();                                
+                            writer.flush();                                
                 	}
                     System.out.println("The user: " + username + " send this message in broadcast" + message + "\n");
 
                 }else if (code.equals("ONETOONE")) {
+                	System.out.println("INVIA A UNO");
                 	String toUser = messageString[1];
                 	message = messageString[2];
                 	onlineUsers.get(toUser).println("<ONETOONE><" + username + "><" + message +">");
+                	onlineUsers.get(toUser).flush();                                
                     System.out.println("The user: " + username + " send this message to " + toUser + " :" + message + "\n");
 
                 }else if (code.equals("USERSLIST")) {
                 	username = messageString[1];
+                	System.out.println(code);
+                	System.out.println(username);
                 	String usersList = "";
                 	for(String user: onlineUsers.keySet()) {
                 		if(!user.equals(username)) {
                 			usersList += "<" + user.toString() + ">";
                 		}
                 	}
-                    System.out.println("Users List required from" + username + ": "+ usersList+"\n");
+                	onlineUsers.get(username).println("<USERSLIST>"+usersList);
+                	onlineUsers.get(username).flush();                                
+                    System.out.println("Users List required from " + username + ": "+ usersList+"\n");
 
                 }
             }

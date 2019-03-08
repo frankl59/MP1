@@ -33,7 +33,7 @@ public class ClientGUI {
     private JTextField messageFiel;
     private static ClientChat clientChat;
     protected static JTextArea messagesArea;
-    protected static JList usersList;
+    protected static JList<String> usersList;
 
     /**
      * Launch the application.
@@ -66,7 +66,7 @@ public class ClientGUI {
     public static JTextArea getMessagesArea(){
         return messagesArea;
     }
-    public static JList getUsersList(){
+    public static JList<String> getUsersList(){
         return usersList;
     }
     private void initialize() {
@@ -161,7 +161,10 @@ public class ClientGUI {
 
         btnSend.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                clientChat.sendMessage(messageFiel.getText(), "");
+            	String sendTo="";
+            	if (usersList.getSelectedValue()!=null)
+            		sendTo = usersList.getSelectedValue();
+                clientChat.sendMessage(messageFiel.getText(), sendTo);
             }
         });
         btnSend.setBounds(655, 410, 101, 23);

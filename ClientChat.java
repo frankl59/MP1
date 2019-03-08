@@ -11,11 +11,13 @@ public class ClientChat implements Runnable{
 
     private String user;
     public static final int PORT = 7777;
-
+    
+    private Thread receivedThread;
     private Socket sock;
     private Writer usersList;
     private JTextArea message;
     private JList list;
+    
     public String getUser() {
         return user;
     }
@@ -31,15 +33,16 @@ public class ClientChat implements Runnable{
             user = username;
             prw.println("<LOGIN>" + "<" + getUser() + ">");
             prw.flush();
-            Thread t= new Thread(this);
-            t.start();
+            receivedThread = new Thread(this);
+            receivedThread.start();
             
         } catch (IOException ex) {
             Logger.getLogger(ClientChat.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void logout(String username) throws IllegalArgumentException {
+    @SuppressWarnings("deprecation")
+	public void logout(String username) throws IllegalArgumentException {
 
         try {
             // CREATE STRING LOGIN + getUser()           
@@ -54,6 +57,7 @@ public class ClientChat implements Runnable{
         } finally {
             try {
                 sock.close();
+                receivedThread.stop();
             } catch (IOException ex) {
                 Logger.getLogger(ClientChat.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -69,15 +73,24 @@ public class ClientChat implements Runnable{
             Reader rd = new InputStreamReader(is, "UTF-16");
             BufferedReader brd = new BufferedReader(rd);
             while ((answer = brd.readLine()) != null) {
-                System.out.println("sei qui");
-                System.out.println(answer);
                 String[] messageString = answer.substring(1, answer.length() - 1).split("><");
-                if ("BROADCAST".equals(messageString[0]) || "ONETONE".equals(messageString[0])) {
-                    message.append("Messaggio da " + messageString[1] + ": " + messageString[2] + "/n");
-                    System.out.println("Messaggio da " + messageString[1] + ": " + messageString[2] + "/n");
-//                if(sock.isClosed())
-//                    break;
+                if ("BROADCAST".equals(messageString[0]) || "ONETOONE".equals(messageString[0])) {
+                    message.append("Messaggio da " + messageString[1] + ": " + messageString[2] + "\n");
+                    System.out.println("Messaggio da " + messageString[1] + ": " + messageString[2] + "\n");
+                }else if("USERSLIST".equals(messageString[0])){
+                	//salvo la risposta
+                    System.out.println(answer);
+                    
+                    if(messageString[0].equals("USERSLIST")){
+                        System.out.println("Users updated - PRE\n");
+                    	 String[] users = new String[messageString.length];
+                         for(int i=1;i<messageString.length;i++)
+                           users[i-1]=messageString[i];
+                        list.setListData(users);
+                    System.out.println("Users updated\n");
+                    }
                 }
+                
 
             }
         } catch (IOException ex) {
@@ -85,29 +98,15 @@ public class ClientChat implements Runnable{
         }
     }
 
-public void updateUsersList(JList list) {
+public void updateUsersList(JList<String> list) {
         InputStream is;
         try {
             //invio richiesta
             OutputStream os = sock.getOutputStream();
             Writer wr = new OutputStreamWriter(os, "UTF-16");
             PrintWriter prw = new PrintWriter(wr);
-            prw.println("<USERSLIST>" + "<>");
+            prw.println("<USERSLIST>" + "<"+ user +">");
             prw.flush();
-            
-            //salvo la risposta
-            is = sock.getInputStream();
-            Reader rd = new InputStreamReader(is, "UTF-16");
-            BufferedReader brd = new BufferedReader(rd);
-            String answer = brd.readLine();
-            System.out.println(answer);
-            String[] messageString = answer.substring(1, answer.length()-1).split("><");
-            if(messageString[0].equals("USERLIST")){
-                messageString[0].trim();
-                list.setListData(messageString);
-            
-
-}
                 
             //list.(answer + "/n");
         } catch (IOException ex) {
