@@ -73,6 +73,7 @@ public class ThreadedServer implements Runnable {
 	                    if (!username.isEmpty() && !onlineUsers.containsKey(username)) {
 	                    	onlineUsers.put(username, prw);
 	                        System.out.println("The user: " + username + " is connected.\n");
+	                        getUsersList(); //aggiorniamo lista utenti visibile al client non appena se ne collega uno
 	                        break;
 	                    }else {
 	                        System.out.println("The username " + username + " is already used.\n");
@@ -95,7 +96,7 @@ public class ThreadedServer implements Runnable {
                 	username = messageString[1];
                 	onlineUsers.remove(username);
                     System.out.println("Logout for: " + username + "\n");
-
+                    getUsersList(); //aggiorniamo lista utenti visibile al client non appena se ne scollega uno
                     return;
                 }
                 else if (code.equals("BROADCAST")) {
@@ -137,12 +138,23 @@ public class ThreadedServer implements Runnable {
         }
        finally {
        try {
-        	System.out.println("Connection Closed");
         	brd.close();
         	prw.close();
-            sock.close();            
+            sock.close();    
+        	System.out.println("Connection Closed");
         } catch (IOException exc2) {
         }
        }
+    }
+    public void getUsersList() {
+    	   String usersList = "";
+           for (String user : onlineUsers.keySet()) {
+               usersList += "<" + user.toString() + ">";
+           }
+           for (PrintWriter writer : onlineUsers.values()) {
+               writer.println("<USERSLIST>" + usersList);
+               writer.flush();
+       }            
+           System.out.println("Users List : " + usersList + "\n");
     }
 }
