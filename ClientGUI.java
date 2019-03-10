@@ -1,36 +1,25 @@
-
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-import java.awt.GridLayout;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import javax.swing.JList;
-import javax.swing.JTextArea;
 import java.awt.Color;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-
-//import net.miginfocom.swing.MigLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
-import javax.swing.plaf.basic.BasicListUI.ListSelectionHandler;
 import javax.swing.border.BevelBorder;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTextPane;
-import javax.swing.JEditorPane;
+
+/**
+*
+* @author group ??
+*/
 
 public class ClientGUI {
 
@@ -44,9 +33,9 @@ public class ClientGUI {
     private static JButton loginButton;
     private static JButton logoutButton;
     private DefaultListModel<String> model ;
-    private String oldDestination;
     /**
      * Launch the application.
+     * @param args 
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -70,28 +59,53 @@ public class ClientGUI {
         initialize();
     }
 
-    /**
-     * Initialize the contents of the frame.
-     */
+   /**
+    * 
+    * @return reference to stateConnectionField
+    */
     
     public static JTextField getStateTextField(){
         return stateTextField;
     }
+    /**
+     * 
+     * @return  reference to messageArea
+     */
     public static JTextPane getMessagesArea(){
         return messagesArea;
     }
+    /**
+     * 
+     * @return reference to the usersList
+     */
     public static JList<String> getUsersList(){
         return usersList;
     }
+    /**
+     * 
+     * @return reference to messageBox
+     */
     public static JTextField getMessageField(){
         return messageField;
     }
+    /**
+     * 
+     * @return reference to loginButton
+     */
     public static JButton getLoginButton(){
         return loginButton;
     }
+    /**
+     * 
+     * @return reference to logoutButton
+     */
     public static JButton getLogoutButton(){
         return logoutButton;
     }
+    
+    /**
+     * Initialize the contents of the frame.
+     */
     private void initialize() {
         frame = new JFrame();
         frame.setBounds(100, 100, 782, 483);
@@ -137,11 +151,11 @@ public class ClientGUI {
             public void actionPerformed(ActionEvent arg0) {
                 clientChat.logout(usernameTextField.getText());
                 //stateTextField.setText("Not Connected");             
-                loginButton.setEnabled(true);
+                //loginButton.setEnabled(true);
                 usersList.setListData(new String[0]);
                 //model.clear();
                 //userListButton.setEnabled(false);
-                logoutButton.setEnabled(false);
+                //logoutButton.setEnabled(false);
                 
                 btnSend.setEnabled(false);
             }
@@ -184,8 +198,7 @@ public class ClientGUI {
             	String sendTo="";
             	
             	if (usersList.getSelectedValue()!=null) {
-            		sendTo = usersList.getSelectedValue();
-                	oldDestination=sendTo;
+            		sendTo = usersList.getSelectedValue();               	
             	}	
             	clientChat.sendMessage(messageField.getText(), sendTo);
                 messageField.setText("");

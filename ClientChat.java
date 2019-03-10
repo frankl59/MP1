@@ -1,15 +1,10 @@
-import java.awt.Font;
-import java.awt.font.TextAttribute;
 import java.io.*;
 import java.net.*;
-import java.text.AttributedString;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
@@ -17,11 +12,15 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+/**
+*
+* @author group ??
+*/
+
 public class ClientChat implements Runnable {
 
 	private String user;
 	public static final int PORT = 7777;
-
 	private Thread receivedThread;
 	private Socket sock;
 	private Writer usersList;
@@ -34,7 +33,12 @@ public class ClientChat implements Runnable {
 	public String getUser() {
 		return user;
 	}
-
+	
+	/**
+	 * 
+	 * @param username the name of who wants to login
+	 * @throws IllegalArgumentException
+	 */
 	public void login(String username) throws IllegalArgumentException {
 
 		try {
@@ -56,13 +60,17 @@ public class ClientChat implements Runnable {
 			stateField.setText("Connected");
 			receivedThread = new Thread(this);
 			receivedThread.start();
-
+			loginButton.setEnabled(false);
 		} catch (IOException ex) {
 			Logger.getLogger(ClientChat.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * 
+	 * @param username the name of who wants to login
+	 * @throws IllegalArgumentException 
+	 */
 	public void logout(String username) throws IllegalArgumentException {
 
 		try {
@@ -86,7 +94,10 @@ public class ClientChat implements Runnable {
 			}
 		}
 	}
-
+	
+	/**
+	 * Unpack the messages from the server 
+	 */
 	private void receivedMessage() {
 
 		String answer = "";
@@ -99,8 +110,8 @@ public class ClientChat implements Runnable {
 
 			while ((answer = brd.readLine()) != null) {
 
-				String[] messageString = answer.substring(1, answer.length() - 1).split("><");
-				HTMLDocument doc = (HTMLDocument) messages.getDocument();
+				String[] messageString = answer.substring(1, answer.length() - 1).split("><"); //split the received message
+				HTMLDocument doc = (HTMLDocument) messages.getDocument();  //used to obtain a better visual of the messages 
 				HTMLEditorKit editorKit = (HTMLEditorKit) messages.getEditorKit();
 				String text="";
 				if ("BROADCAST".equals(messageString[0])) {
@@ -122,8 +133,7 @@ public class ClientChat implements Runnable {
 
 					System.out.println("[PRIVATE] Message from " + messageString[1] + " to " + user +" :" + messageString[2] + "\n");
 
-				} else if ("USERSLIST".equals(messageString[0])) {
-					// salvo la risposta
+				} else if ("USERSLIST".equals(messageString[0])) {					
 					System.out.println(answer);
 
 					if (messageString[0].equals("USERSLIST")) {
@@ -170,7 +180,12 @@ public class ClientChat implements Runnable {
 //			Logger.getLogger(ClientChat.class.getName()).log(Level.SEVERE, null, ex);
 //		}
 //	}
-
+    
+	/**
+	 * 
+	 * @param message String
+	 * @param destination String
+	 */
 	public void sendMessage(String message, String destination) {
 		String messaggio = "";
 		HTMLDocument doc = (HTMLDocument) messages.getDocument();

@@ -5,16 +5,13 @@
  */
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author admin
+ * @author group ??
  */
 public class ThreadedServer implements Runnable {
 	
@@ -30,14 +27,18 @@ public class ThreadedServer implements Runnable {
         sock = s;
 
     }
-
+    /**
+     * 
+     * @param args
+     * @throws IOException
+     */
     public static void main(String args[]) throws IOException {
     	
         System.out.println("The chat server is running...");
         
         ServerSocket serv = new ServerSocket(PORT);
         while (true) {
-            Socket sock = serv.accept();
+            Socket sock = serv.accept();  
             ThreadedServer server = new ThreadedServer(sock);
             Thread t = new Thread(server);
             t.start();
@@ -62,18 +63,18 @@ public class ThreadedServer implements Runnable {
         	
             while ((s = brd.readLine()) != null) {
                 
-            	String[] connectionString = s.substring(1, s.length()-1).split("><");
+            	String[] connectionString = s.substring(1, s.length()-1).split("><");   //split the received message
                 
                 
-            	code = connectionString[0];
+            	code = connectionString[0];    
             	username = connectionString[1];
-                
+                //check for the kind of message received 
             	if(code.equals("LOGIN")) {
 	                synchronized (onlineUsers) {
 	                    if (!username.isEmpty() && !onlineUsers.containsKey(username)) {
-	                    	onlineUsers.put(username, prw);
+	                    	onlineUsers.put(username, prw); //the username was not logged 
 	                        System.out.println("The user: " + username + " is connected.\n");
-	                        getUsersList(); //aggiorniamo lista utenti visibile al client non appena se ne collega uno
+	                        getUsersList(); //display the updated list of online users in every client  
 	                        break;
 	                    }else {
 	                        System.out.println("The username " + username + " is already used.\n");
@@ -94,14 +95,14 @@ public class ThreadedServer implements Runnable {
             	
                 if (code.equals("LOGOUT")) {
                 	username = messageString[1];
-                	onlineUsers.remove(username);
+                	onlineUsers.remove(username);  
                     System.out.println("Logout for: " + username + "\n");
-                    getUsersList(); //aggiorniamo lista utenti visibile al client non appena se ne scollega uno
+                    getUsersList(); //display the updated list of online users in every client  
                     return;
                 }
                 else if (code.equals("BROADCAST")) {
                 	message = messageString[2];
-                	for (PrintWriter writer : onlineUsers.values()) {
+                	for (PrintWriter writer : onlineUsers.values()) {  //select all clients logged to display the broadcastmessage
                 		if(writer != onlineUsers.get(username))
                 			writer.println("<BROADCAST><" + username + "><" + message +">");
                             writer.flush();                                
@@ -110,26 +111,26 @@ public class ThreadedServer implements Runnable {
 
                 }else if (code.equals("ONETOONE")) {
                 	System.out.println("INVIA A UNO");
-                	String toUser = messageString[1];
+                	String toUser = messageString[1];  //the destination
                 	message = messageString[2];
                 	onlineUsers.get(toUser).println("<ONETOONE><" + username + "><" + message +">");
                 	onlineUsers.get(toUser).flush();                                
                     System.out.println("The user: " + username + " send this message to " + toUser + " :" + message + "\n");
 
-                }else if (code.equals("USERSLIST")) {
-                	username = messageString[1];
-                	System.out.println(code);
-                	System.out.println(username);
-                	String usersList = "";
-                	for(String user: onlineUsers.keySet()) {
-                		if(!user.equals(username)) {
-                			usersList += "<" + user.toString() + ">";
-                		}
-                	}
-                	onlineUsers.get(username).println("<USERSLIST>"+usersList);
-                	onlineUsers.get(username).flush();                                
-                    System.out.println("Users List required from " + username + ": "+ usersList+"\n");
-
+//                }else if (code.equals("USERSLIST")) {
+//                	username = messageString[1];
+//                	System.out.println(code);
+//                	System.out.println(username);
+//                	String usersList = "";
+//                	for(String user: onlineUsers.keySet()) {
+//                		if(!user.equals(username)) {
+//                			usersList += "<" + user.toString() + ">";
+//                		}
+//                	}
+//                	onlineUsers.get(username).println("<USERSLIST>"+usersList);
+//                	onlineUsers.get(username).flush();                                
+//                    System.out.println("Users List required from " + username + ": "+ usersList+"\n");
+//
                 }
             }
             
@@ -146,12 +147,16 @@ public class ThreadedServer implements Runnable {
         }
        }
     }
+    
+    /**
+     * create and send the updated list of every logged client 
+     */
     public void getUsersList() {
     	   String usersList = "";
-           for (String user : onlineUsers.keySet()) {
+           for (String user : onlineUsers.keySet()) {  
                usersList += "<" + user.toString() + ">";
            }
-           for (PrintWriter writer : onlineUsers.values()) {
+           for (PrintWriter writer : onlineUsers.values()) {  
                writer.println("<USERSLIST>" + usersList);
                writer.flush();
        }            
