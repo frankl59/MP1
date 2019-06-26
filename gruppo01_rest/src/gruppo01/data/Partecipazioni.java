@@ -21,14 +21,18 @@ public class Partecipazioni implements Serializable {
 	@Column(name="ID_OPERATORE")
 	private int idOperatore;
 
+	//bi-directional many-to-one association to TourCategoria
+	@ManyToOne
+	@JoinColumn(name="ID_CATEGORIA_TOUR")
+	private TourCategoria tourCategoria;
+
 	//bi-directional many-to-one association to Partecipante
-	@JsonbTransient
 	@ManyToOne
 	@JoinColumn(name="USERNAME_PARTECIPANTE")
 	private Partecipante partecipante;
 
-	//bi-directional many-to-one association to Tour
 	@JsonbTransient
+	//bi-directional many-to-one association to Tour
 	@ManyToOne
 	@JoinColumn(name="ID_TOUR")
 	private Tour tour;
@@ -50,6 +54,14 @@ public class Partecipazioni implements Serializable {
 
 	public void setIdOperatore(int idOperatore) {
 		this.idOperatore = idOperatore;
+	}
+
+	public TourCategoria getTourCategoria() {
+		return this.tourCategoria;
+	}
+
+	public void setTourCategoria(TourCategoria tourCategoria) {
+		this.tourCategoria = tourCategoria;
 	}
 
 	public Partecipante getPartecipante() {

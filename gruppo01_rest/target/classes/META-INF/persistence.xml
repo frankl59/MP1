@@ -8,10 +8,10 @@
 		<class>gruppo01.data.PartecipazioniPK</class>
 		<class>gruppo01.data.Tour</class>
 		<class>gruppo01.data.TourCategoria</class>
-		<class>gruppo01.data.TourPK</class>
+		
 				<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-			<property name="javax.persistence.jdbc.url" value='jdbc:mysql://localhost:3306/mp?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC'/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/mp?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=CET"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>
 			<property name="javax.persistence.jdbc.password" value=""/>
 		</properties>

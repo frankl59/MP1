@@ -26,9 +26,14 @@ public class TourCategoria implements Serializable {
 	@Column(name="DESCRIZIONE_CATEGORIA_TOUR")
 	private String descrizioneCategoriaTour;
 
+	@JsonbTransient
+	//bi-directional many-to-one association to Partecipazioni
+	@OneToMany(mappedBy="tourCategoria")
+	private List<Partecipazioni> partecipazionis;
+
+	@JsonbTransient
 	//bi-directional many-to-one association to Tour
 	@OneToMany(mappedBy="tourCategoria")
-	@JsonbTransient
 	private List<Tour> tours;
 
 	public TourCategoria() {
@@ -48,6 +53,28 @@ public class TourCategoria implements Serializable {
 
 	public void setDescrizioneCategoriaTour(String descrizioneCategoriaTour) {
 		this.descrizioneCategoriaTour = descrizioneCategoriaTour;
+	}
+
+	public List<Partecipazioni> getPartecipazionis() {
+		return this.partecipazionis;
+	}
+
+	public void setPartecipazionis(List<Partecipazioni> partecipazionis) {
+		this.partecipazionis = partecipazionis;
+	}
+
+	public Partecipazioni addPartecipazioni(Partecipazioni partecipazioni) {
+		getPartecipazionis().add(partecipazioni);
+		partecipazioni.setTourCategoria(this);
+
+		return partecipazioni;
+	}
+
+	public Partecipazioni removePartecipazioni(Partecipazioni partecipazioni) {
+		getPartecipazionis().remove(partecipazioni);
+		partecipazioni.setTourCategoria(null);
+
+		return partecipazioni;
 	}
 
 	public List<Tour> getTours() {

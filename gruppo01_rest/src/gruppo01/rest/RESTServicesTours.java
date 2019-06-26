@@ -10,7 +10,6 @@ import javax.persistence.TypedQuery;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -62,53 +61,53 @@ public class RESTServicesTours {
 	}
 	
 	@GET
-    @Path("{tour_category}/{id_tour}")
-    @Produces("application/json")
-    public Response visualizzaToursDellaCategoria(
-        @PathParam("tour_category") int tour_category,
-        @PathParam("id_tour") int id_tour) {
-      EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
-      EntityManager em = emf.createEntityManager();
-      em.getTransaction().begin();
-      TourCategoria categoria = em.find(TourCategoria.class, tour_category);
-      Tour tour=em.find(Tour.class,id_tour);
-      TypedQuery<Tour> query = em.createQuery("SELECT t FROM Tour t where t.tourCategoria  = :categoria and t.idTour  = :tour",Tour.class);  
-      query.setParameter("categoria", categoria);  
-      query.setParameter("tour", id_tour);  
-//      TypedQuery<Partecipazioni> query2 = em.createQuery("SELECT p FROM Partecipazioni p where p.tour = :tour",Partecipazioni.class);
-//      query2.setParameter("tour", tour);
-      //List<Partecipazioni> partecipazioni=query2.getResultList();
-      //System.out.println(partecipazioni.size());
-      Tour tourResult = query.getSingleResult();
-      JSONObject response=new JSONObject();
-      JSONObject category = new JSONObject();
-      try {
-        response.put("idTour", tourResult.getIdTour());
-        response.put("nomeTour", tourResult.getNomeTour());
-        response.put("imgTour", tourResult.getImgTour());
-        response.put("dataTour", tourResult.getDataTour());
-        response.put("durataMinTour", tourResult.getDurataMinTour());
-        response.put("costoTour", tourResult.getCostoTour());
-        response.put("numeroMassimoPartecipantiTour",tourResult.getNumeroMassimoPartecipantiTour());
-        response.put("descrizioneTour", tourResult.getDescrizioneTour());
-        response.put("numeroPartecipantiTour",tourResult.getPartecipazionis().size());
-        category.put("descrizioneCategoriaTour", 1);
-        category.put("idCategoriaTour", 1);    
-        response.put("tourCategoria",category);
-      } catch (JSONException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      
-      em.getTransaction().commit();
-      em.close();
-      emf.close();
-      return Response.ok()
-          .header("Access-Control-Allow-Origin", "*")
-          .header("Access-Control-Allow-Methods", "GET")
-          .entity(response.toString())
-          .build();
-    }
+	  @Path("{tour_category}/{id_tour}")
+	  @Produces("application/json")
+	  public Response visualizzaToursDellaCategoria(
+	      @PathParam("tour_category") int tour_category,
+	      @PathParam("id_tour") int id_tour) {
+	    EntityManagerFactory emf = Persistence.createEntityManagerFactory("PU");
+	    EntityManager em = emf.createEntityManager();
+	    em.getTransaction().begin();
+	    TourCategoria categoria = em.find(TourCategoria.class, tour_category);
+	    Tour tour=em.find(Tour.class,id_tour);
+	    TypedQuery<Tour> query = em.createQuery("SELECT t FROM Tour t where t.tourCategoria  = :categoria and t.idTour  = :tour",Tour.class);  
+	    query.setParameter("categoria", categoria);  
+	    query.setParameter("tour", id_tour);  
+	    TypedQuery<Partecipazioni> query2 = em.createQuery("SELECT p FROM Partecipazioni p where p.tour = :tour",Partecipazioni.class);
+	    query2.setParameter("tour", tour);
+	    List<Partecipazioni> partecipazioni=query2.getResultList();
+	    int numero_partecipanti = partecipazioni.size();
+	    Tour tourResult = query.getSingleResult();
+	    JSONObject response=new JSONObject();
+	    JSONObject category = new JSONObject();
+	    try {
+	      response.put("idTour", tourResult.getIdTour());
+	      response.put("nomeTour", tourResult.getNomeTour());
+	      response.put("imgTour", tourResult.getImgTour());
+	      response.put("dataTour",tourResult.getDataTour().toGMTString());
+	      response.put("durataMinTour", tourResult.getDurataMinTour());
+	      response.put("costoTour", tourResult.getCostoTour());
+	      response.put("numeroMassimoPartecipantiTour",tourResult.getNumeroMassimoPartecipantiTour());
+	      response.put("descrizioneTour", tourResult.getDescrizioneTour());
+	      response.put("numeroPartecipantiTour",numero_partecipanti);
+	      category.put("descrizioneCategoriaTour", 1);
+	      category.put("idCategoriaTour", 1);	  
+	      response.put("tourCategoria",category);
+	    } catch (JSONException e) {
+	      // TODO Auto-generated catch block
+	      e.printStackTrace();
+	    }
+	    
+	    em.getTransaction().commit();
+	    em.close();
+	    emf.close();
+	    return Response.ok()
+	        .header("Access-Control-Allow-Origin", "*")
+	        .header("Access-Control-Allow-Methods", "GET")
+	        .entity(response.toString())
+	        .build();
+	  }
 	
 		
 }

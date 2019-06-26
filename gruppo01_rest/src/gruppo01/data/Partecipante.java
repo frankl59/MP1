@@ -17,6 +17,7 @@ public class Partecipante implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@SequenceGenerator(name="PARTECIPANTE_USERNAMEPARTECIPANTE_GENERATOR" )
 	@Column(name="USERNAME_PARTECIPANTE")
 	private String usernamePartecipante;
 
@@ -29,12 +30,13 @@ public class Partecipante implements Serializable {
 	@Column(name="NOME_PARTECIPANTE")
 	private String nomePartecipante;
 
+	@JsonbTransient
 	@Column(name="PASSWORD_PARTECIPANTE")
 	private String passwordPartecipante;
 
-	@JsonbTransient
 	//bi-directional many-to-one association to Partecipazioni
-	@OneToMany(mappedBy="partecipante", orphanRemoval = true)
+	@JsonbTransient
+	@OneToMany(mappedBy="partecipante")
 	private List<Partecipazioni> partecipazionis;
 
 	public Partecipante() {

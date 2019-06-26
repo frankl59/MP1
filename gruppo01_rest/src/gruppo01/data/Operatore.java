@@ -37,15 +37,14 @@ public class Operatore implements Serializable {
 
 	@Column(name="WEBSITE_OPERATORE")
 	private String websiteOperatore;
-
+	
 	//bi-directional many-to-one association to OperatoreTipologia
-	//@JsonbTransient
 	@ManyToOne
 	@JoinColumn(name="ID_TIPO_OPERATORE")
 	private OperatoreTipologia operatoreTipologia;
-
-	//bi-directional many-to-one association to Tour
+	
 	@JsonbTransient
+	//bi-directional many-to-one association to Tour
 	@OneToMany(mappedBy="operatore")
 	private List<Tour> tours;
 

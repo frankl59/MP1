@@ -25,7 +25,7 @@ public class OperatoreTipologia implements Serializable {
 
 	@Column(name="DESCRIZIONE_TIPO_OPERATORE")
 	private String descrizioneTipoOperatore;
-	
+
 	@JsonbTransient
 	//bi-directional many-to-one association to Operatore
 	@OneToMany(mappedBy="operatoreTipologia")

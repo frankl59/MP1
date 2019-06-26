@@ -26,7 +26,7 @@ public class Tour implements Serializable {
 	@Column(name="COSTO_TOUR")
 	private float costoTour;
 
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="DATA_TOUR")
 	private Date dataTour;
 
@@ -45,8 +45,8 @@ public class Tour implements Serializable {
 	@Column(name="NUMERO_MASSIMO_PARTECIPANTI_TOUR")
 	private int numeroMassimoPartecipantiTour;
 
-	//bi-directional many-to-one association to Partecipazioni
 	@JsonbTransient
+	//bi-directional many-to-one association to Partecipazioni
 	@OneToMany(mappedBy="tour")
 	private List<Partecipazioni> partecipazionis;
 
@@ -56,7 +56,6 @@ public class Tour implements Serializable {
 	private TourCategoria tourCategoria;
 
 	//bi-directional many-to-one association to Operatore
-	@JsonbTransient
 	@ManyToOne
 	@JoinColumn(name="ID_OPERATORE")
 	private Operatore operatore;

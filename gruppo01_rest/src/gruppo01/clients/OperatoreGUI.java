@@ -101,22 +101,30 @@ public class OperatoreGUI extends JFrame{
 					idTour=JOptionPane.showInputDialog("Inserire l'id del tour da visualizzare:");
 				while(idTour==null);
 				
-				JSONArray response=client.visualizzaPartecipanti(textId.getText(), idTour);
-				String stampa="";		
-				for(int i=0;i<response.length();i++) {
-					JSONObject tmp = null;				
-					try {
-						tmp = new JSONObject(response.getString(i));
-						//System.out.println(tmp.toString());
-						//"ID :"+ tmp.getString("idOperatore")+ "\n" +						
-						stampa+=  "Nome : "+tmp.getString("nomePartecipante") +"\n"+ "Cognome : "+ tmp.getString("nomePartecipante")+
-								"\n"+ "Username : "+ tmp.getString("usernamePartecipante")+ "\n"+ "Email : "+tmp.getString("emailPartecipante") +
-								"\n \n";											
-					} catch (JSONException ex) {
-						// TODO Auto-generated catch block
-						console.setText("errore.si prega di riprovare");
-					}					
+				
+				JSONArray response=null;
+				String stampa="";
+				try {
+					response=client.visualizzaPartecipanti(textId.getText(), idTour);
+							
+					for(int i=0;i<response.length();i++) {
+						JSONObject tmp = null;				
+						try {
+							tmp = new JSONObject(response.getString(i));
+							//System.out.println(tmp.toString());
+							//"ID :"+ tmp.getString("idOperatore")+ "\n" +						
+							stampa+=  "Nome : "+tmp.getString("nomePartecipante") +"\n"+ "Cognome : "+ tmp.getString("nomePartecipante")+
+									"\n"+ "Username : "+ tmp.getString("usernamePartecipante")+ "\n"+ "Email : "+tmp.getString("emailPartecipante") +
+									"\n \n";											
+						} catch (JSONException ex) {
+							// TODO Auto-generated catch block
+							console.setText("errore.si prega di riprovare");
+						}
+					}
+				}catch(Exception e) {
+					console.setText("non sono presenti partecipanti");
 				}
+							
 				if(response.length()>0)
 					console.setText(stampa);
 				else
